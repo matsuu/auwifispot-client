@@ -42,7 +42,7 @@ au Wi-Fi SPOTで使えるアクセスポイントは次のSSIDのもののよう
 
 cpanmなどでインストールすればいいんじゃないでしょうか。
 
-    # cpanm -L http://cpanmin.us/ | perl - File::Temp Getopt::Long JSON LWP::UserAgent Pod::Usage Web::Scraper XML::Simple
+    # curl -L http://cpanmin.us/ | perl - File::Temp Getopt::Long JSON LWP::UserAgent Pod::Usage Web::Scraper XML::Simple
 
 ### 事前の機器登録(MACアドレス登録)
 
