@@ -25,14 +25,17 @@ auの「ISフラット」もしくは「プランF (IS) シンプル/プランF 
 ### 各サービスのSSIDとパスフレーズ
 
 au Wi-Fi SPOTで使えるアクセスポイントは次のSSIDのもののようです。
+
 * au_Wi-Fi
 * Wi2_club
 * Wi2premium_club
 * UQ_Wi-Fi
 
 これらのSSIDを何らかの方法で調べてください。ちなみに、
+
 * [Windows用au Wi-Fi接続ツール](http://www.au.kddi.com/wifi/au_wifi_spot/riyo/pc/windows.html)
 * [OSX用au Wi-Fi接続ツール](http://www.au.kddi.com/wifi/au_wifi_spot/riyo/pc/mac.html)
+
 をインストールして「ネットワーク(SSID)の登録」を押すと、これらのアクセスポイントのパスフレーズがお使いの端末に記録されるので簡単に確認できます。
 
 ### Perl実行環境と以下のPerlモジュール
