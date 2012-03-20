@@ -47,7 +47,7 @@ cpanmなどでインストールすればいいんじゃないでしょうか。
 ### 事前の機器登録(MACアドレス登録)
 
 まずauwifi_authenticate.plで、au Wi-Fi SPOTで使用する機器のMACアドレスを登録します。
-*これはau Wi-Fi SPOTのアクセスポイントでは実施できません。事前にインターネットに接続できる環境で実施してください。*
+**これはau Wi-Fi SPOTのアクセスポイントでは実施できません。事前にインターネットに接続できる環境で実施してください。**
 
     # perl auwifi_authorize.pl -i [au ID] -p [au IDのパスワード] -m [MACアドレス]
 
