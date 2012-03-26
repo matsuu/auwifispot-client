@@ -17,10 +17,6 @@ my $passwd;
 GetOptions("u|user_id=s" => \$user_id, "p|passwd=s" => \$passwd) or pod2usage(2);
 pod2usage(1) unless $user_id && $passwd;
 
-# for au
-my $username = $user_id =~ /@/ ? $user_id : sprintf('%s@au', $user_id);
-
-# Wi-Fi接続ツールがこのアドレスにアクセスしていたが、
 # 多分なんでもok
 my $certification_url = "http://www.au.kddi.com/au_wifi_spot/certification2/";
 
@@ -47,35 +43,40 @@ my $error_types = {
 sub parse_wispr {
   my ($response) = shift;
 
-  # redirectでもcontentが含まれる場合はリダイレクトさせない(au Wi-Fi SPOT対策)
-  if($response->is_redirect) {
-    if ($response->content_length == 0) {
-      # Wi2はLocationが相対パスなので補う
-      # LWP::UserAgentから拝借
-      my $referral_uri = $response->header('Location');
-      {
-        local $URI::ABS_ALLOW_RELATIVE_SCHEME = 1;
-        my $base = $response->base;
-        $referral_uri = "" unless defined $referral_uri;
-        $referral_uri = $HTTP::URI_CLASS->new($referral_uri, $base)->abs($base);
-      }
-      return parse_wispr($ua->get($referral_uri));
+  # contentが含まれる場合はまず中身を確認
+  if ($response->content_length > 0) {
+    my $content = $response->decoded_content;
+
+    # Wi2のWISPrがぶっこわれてるので書き換える
+    $content =~ s/-->ISPAccessGatewayParam>/<\/WISPAccessGatewayParam>-->/;
+    $content =~ s/(xmlns:xsi)=(http:\/\/www.w3.org\/2001\/XMLSchema-instance)/$1="$2"/;
+
+    # WISPAccessGateWayParamが含まれていればWISPrプロトコルと判断
+    if($content =~ qr{(<WISPAccessGatewayParam.*</WISPAccessGatewayParam>)}s) {
+      return XMLin($1);
     }
   }
-  elsif(!$response->is_success) {
-    die $response->status_line;
+
+  # もしWISPrプロトコルが含まれていなくてリダイレクトならリダイレクトに従う
+  if($response->is_redirect) {
+    # Wi2はLocationが相対パスなので補う
+    # LWP::UserAgentから拝借
+    my $referral_uri = $response->header('Location');
+    {
+      local $URI::ABS_ALLOW_RELATIVE_SCHEME = 1;
+      my $base = $response->base;
+      $referral_uri = "" unless defined $referral_uri;
+      $referral_uri = $HTTP::URI_CLASS->new($referral_uri, $base)->abs($base);
+    }
+    return parse_wispr($ua->get($referral_uri));
   }
-
-  my $content = $response->decoded_content;
-
-  # Wi2のWISPrがぶっこわれてるので
-  $content =~ s/-->ISPAccessGatewayParam>/<\/WISPAccessGatewayParam>-->/;
-  $content =~ s/(xmlns:xsi)=(http:\/\/www.w3.org\/2001\/XMLSchema-instance)/$1="$2"/;
-
-  if($content !~ qr{(<WISPAccessGatewayParam.*</WISPAccessGatewayParam>)}s) {
-    die "no WISPr(Already connected?)." 
+  elsif($response->is_success) {
+    print "No WISPr protocol found.(Already connected?)\n";
   }
-  return XMLin($1);
+  else {
+    printf "Unknown status: %s", $response->status_line;
+  }
+  exit 1;
 }
 
 my ($xml, $reply, $response_code);
@@ -127,11 +128,11 @@ __END__
 
 =head1 NAME
 
-auwifi_login.pl - au Wi-Fi SPOT login
+wispr_login.pl - au Wi-Fi SPOT login
 
 =head1 SYNOPSIS
 
-auwifi_login.pl [options]
+wispr_login.pl [options]
 
  Options:
   -u, --user_id=[user_id]    set user_id

@@ -77,6 +77,8 @@ if($@) {
 else {
   if(exists $obj->{user_id} && exists $obj->{passwd}) {
     print "Authentication success\n";
+    # WISPrプロトコルで接続する場合は@auが必要。
+    $obj->{user_id} .= '@au';
   }
   else {
     print "Authentication failed\n";
