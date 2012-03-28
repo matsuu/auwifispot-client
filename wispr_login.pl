@@ -97,7 +97,7 @@ foreach my $name (qw(AccessProcedure AccessLocation LocationName)) {
 
 my $login_url = $xml->{Redirect}{LoginURL};
 my %login_params;
-$login_params{UserName} = $username;
+$login_params{UserName} = $user_id;
 $login_params{Password} = $passwd;
 
 $xml = parse_wispr($ua->post($login_url, \%login_params));
