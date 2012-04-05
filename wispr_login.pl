@@ -44,9 +44,8 @@ sub parse_wispr {
   my ($response) = shift;
 
   # contentが含まれる場合はまず中身を確認
-  if ($response->content_length > 0) {
-    my $content = $response->decoded_content;
-
+  my $content = $response->decoded_content;
+  if (defined $content && length($content) > 0) {
     # Wi2のWISPrがぶっこわれてるので書き換える
     $content =~ s/-->ISPAccessGatewayParam>/<\/WISPAccessGatewayParam>-->/;
     $content =~ s/(xmlns:xsi)=(http:\/\/www.w3.org\/2001\/XMLSchema-instance)/$1="$2"/;
